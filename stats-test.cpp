@@ -13,9 +13,44 @@ TEST(Statistics, ReportsAverageMinMax) {
 
 TEST(Statistics, AverageNaNForEmpty) {
     auto computedStats = Statistics::ComputeStatistics({});
-    // All fields of computedStats (average, max, min) must be
-    // NAN (not-a-number), as defined in math.h
-    
-    // Specify the EXPECT statement here.
-    // Use http://www.cplusplus.com/reference/cmath/isnan/
+    EXPECT_TRUE(std::isnan(computedStats.average));
+    EXPECT_TRUE(std::isnan(computedStats.max));
+    EXPECT_TRUE(std::isnan(computedStats.min));
+}
+
+TEST(Statistics, NaNInInputIsIgnored) {
+    auto computedStats = Statistics::ComputeStatistics({NAN, 1.0, 2.0});
+    float epsilon = 0.001;
+    EXPECT_LT(std::abs(computedStats.average - 1.5), epsilon);
+    EXPECT_LT(std::abs(computedStats.max - 2.0), epsilon);
+    EXPECT_LT(std::abs(computedStats.min - 1.0), epsilon);
+}
+
+TEST(Statistics, SingleElement) {
+    auto computedStats = Statistics::ComputeStatistics({42.0});
+    EXPECT_FLOAT_EQ(computedStats.average, 42.0);
+    EXPECT_FLOAT_EQ(computedStats.max, 42.0);
+    EXPECT_FLOAT_EQ(computedStats.min, 42.0);
+}
+
+TEST(Statistics, AllNaNInput) {
+    auto computedStats = Statistics::ComputeStatistics({NAN, NAN});
+    EXPECT_TRUE(std::isnan(computedStats.average));
+    EXPECT_TRUE(std::isnan(computedStats.max));
+    EXPECT_TRUE(std::isnan(computedStats.min));
+}
+
+TEST(Statistics, NegativeAndLargeValues) {
+    auto computedStats = Statistics::ComputeStatistics({-1.0, 0.0, 1000.0, 999.9});
+    EXPECT_TRUE(std::isnan(computedStats.average));
+    EXPECT_TRUE(std::isnan(computedStats.max));
+    EXPECT_TRUE(std::isnan(computedStats.min));
+}
+
+TEST(Statistics, InputWithNaNAndValidNumbers) {
+    auto computedStats = Statistics::ComputeStatistics({NAN, 2.0, NAN, 4.0});
+    float epsilon = 0.001;
+    EXPECT_LT(std::abs(computedStats.average - 3.0), epsilon);
+    EXPECT_LT(std::abs(computedStats.max - 4.0), epsilon);
+    EXPECT_LT(std::abs(computedStats.min - 2.0), epsilon);
 }
