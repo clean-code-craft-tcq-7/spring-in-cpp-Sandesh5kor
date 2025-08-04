@@ -4,7 +4,8 @@
 #include <algorithm>
 #include <limits>
 
-Stats Statistics::ComputeStatistics(const std::vector<float>& readings) {
+namespace Statistics {
+    Stats ComputeStatistics(const std::vector<float>& readings) {
     //Implement statistics here
     Stats stats;
     // Filter out NaN values
@@ -36,4 +37,5 @@ Stats Statistics::ComputeStatistics(const std::vector<float>& readings) {
     stats.max = *std::max_element(validReadings.begin(), validReadings.end());
     stats.min = *std::min_element(validReadings.begin(), validReadings.end());
     return stats;
+  } 
 }
